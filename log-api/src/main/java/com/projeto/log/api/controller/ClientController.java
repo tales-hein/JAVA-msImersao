@@ -2,6 +2,8 @@ package com.projeto.log.api.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.projeto.log.domain.model.Client;
 import com.projeto.log.domain.repository.ClientRepository;
+import com.projeto.log.domain.service.CatalogClientService;
 
 
 @RestController
@@ -24,9 +27,10 @@ import com.projeto.log.domain.repository.ClientRepository;
 public class ClientController {
 	
 	//Uma alternativa para o autowired é gerar o construtor
-	//do clientRepository
 	@Autowired
 	private ClientRepository clientRepository;
+	@Autowired
+	private CatalogClientService catalogClientService;
 	
 	@GetMapping
 	public List<Client> listar() {
@@ -38,30 +42,21 @@ public class ClientController {
 		return clientRepository.findById(clientId)
 				.map(client -> ResponseEntity.ok(client))
 				.orElse(ResponseEntity.notFound().build());
-		
-		//Optional<Client> client = clientRepository.findById(clientId);
-		//if(client.isPresent()) {
-		//	return ResponseEntity.ok(client.get());
-		//} else {
-		//	return ResponseEntity.notFound().build();
-		//}
 	}
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Client adicionar(@RequestBody Client client) {
-		return clientRepository.save(client);
+	public Client adicionar(@Valid @RequestBody Client client) {
+		return catalogClientService.salvar(client);
 	}
 	
 	@PutMapping("/{clientId}")
-	public ResponseEntity<Client> atualizar(@PathVariable Long clientId, @RequestBody Client client){
+	public ResponseEntity<Client> atualizar(@Valid @PathVariable Long clientId, @RequestBody Client client){
 		if(!clientRepository.existsById(clientId)) {
 			return ResponseEntity.notFound().build();
-		} else {
+		}else{
 			client.setId(clientId);
-			//com o id "setado" o JPA reconhece que o 
-			// save sera na verdade um update
-			client = clientRepository.save(client);
+			client = catalogClientService.salvar(client);
 			return ResponseEntity.ok(client);
 		}
 	}
@@ -71,7 +66,7 @@ public class ClientController {
 		if(!clientRepository.existsById(clientId)) {
 			return ResponseEntity.notFound().build();
 		} else {
-			clientRepository.deleteById(clientId);
+			catalogClientService.excluir(clientId);
 			return ResponseEntity.noContent().build();
 		}
 		

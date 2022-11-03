@@ -6,6 +6,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 @Entity
 public class Client {
@@ -17,8 +20,18 @@ public class Client {
 	//nome da coluna respectiva na tabela
 	//pode-se usar o seguinte recurso:
 	//@Column(name = "nome, na tabela, do atributo abaixo")
+	
+	@NotBlank
+	@Size(max = 60)
 	private String nome;
+	
+	@NotBlank
+	@Email
+	@Size(max = 255)
 	private String email;
+	
+	@NotBlank
+	@Size(max = 20)
 	private String telefone;
 	
 	@Override
