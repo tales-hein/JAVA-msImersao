@@ -29,4 +29,9 @@ public class CatalogClientService {
 	public void excluir(Long clientId) {
 		clientRepository.deleteById(clientId);
 	}
+	
+	public Client buscar(Long clientId) {
+		return clientRepository.findById(clientId)
+				.orElseThrow(()-> new DomainException("Cliente não encontrado."));
+	}
 }
